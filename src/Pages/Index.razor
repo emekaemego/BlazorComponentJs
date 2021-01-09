@@ -1,0 +1,33 @@
+﻿@page "/"
+
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app. <br/>
+
+<button class="btn btn-primary" @onclick="@(async () => await ShowMessage())">Show Message</button>
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+@code {
+    IJSObjectReference module;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender){
+            module = await JS.ComponentModule<Index>();
+        }
+    }
+    
+    async Task ShowMessage() => await module.InvokeVoidAsync("showMessage", "Hello world!");
+
+    async ValueTask IAsyncDisposable.DisposeAsync()
+    {
+        if (module != null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+}
